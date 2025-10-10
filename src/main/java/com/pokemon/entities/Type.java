@@ -1,0 +1,32 @@
+package com.pokemon.entities;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+/**
+ * Represents an elemental typing of a pokemon.
+ */
+@Entity
+@Table(name = "types")
+@Data
+public class Type {
+
+    /**
+     * The unique identifier for the type.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    private Long id;
+
+    /**
+     * The name of the type.
+     */
+    @Column(name = "name", nullable = false, unique = true, length = 20)
+    private String name;
+}
