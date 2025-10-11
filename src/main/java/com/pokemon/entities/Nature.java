@@ -52,8 +52,7 @@ public class Nature {
     @PreUpdate
     private void normalizeStats() {
         if (increasedStat != null && increasedStat.equals(decreasedStat)) {
-            increasedStat = null;
-            decreasedStat = null;
+            throw new IllegalArgumentException("Increased and decreased stats cannot be the same.");
         }
     }
 
