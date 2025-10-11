@@ -116,6 +116,11 @@ public class UserPokemon {
     @Column(name = "speed_iv")
     private Integer speedIv = 31;
 
+    /**
+     * Lifecycle method to ensure that the level, EVs, and IVs are within valid
+     * ranges before persisting or updating the entity.
+     * Sets default values if the provided values are out of range.
+     */
     @PrePersist
     @PreUpdate
     private void prePersist() {
