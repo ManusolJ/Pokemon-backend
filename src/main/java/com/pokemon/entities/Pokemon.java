@@ -1,10 +1,18 @@
 package com.pokemon.entities;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -32,7 +40,7 @@ public class Pokemon {
     /**
      * The name of the pokemon form, if any.
      */
-    @Column(name = "form_name", nullable = false, length = 50)
+    @Column(name = "form_name", length = 50)
     private String formName = null;
 
     /**
@@ -106,4 +114,25 @@ public class Pokemon {
      */
     @Column(name = "speed", nullable = false)
     private Integer speed;
+
+    /**
+     * Abilities available to each pokemon.
+     */
+    @ManyToMany
+    @OneToMany(mappedBy = "pokemon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PokemonAbility> pokemonAbilities = new HashSet<>();
+
+    /**
+     * Learnable moves by each pokemon.
+     */
+    @ManyToMany
+    @JoinTable(name = "pokemon_moves", joinColumns = @JoinColumn(name = "pokemon_id"), inverseJoinColumns = @JoinColumn(name = "move_id"))
+    private Set<Move> moves = new HashSet<>();
+
+    @PrePersist
+    private void validateStats() {
+        if (hp < 0 || attack < 0 || defense < 0 || specialAttack < 0 || specialDefense < 0 || speed < 0) {
+            throw new IllegalStateException("Base stats cannot be negative");
+        }
+    }
 }
