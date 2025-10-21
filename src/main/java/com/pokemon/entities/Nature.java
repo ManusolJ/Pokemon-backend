@@ -1,12 +1,16 @@
 package com.pokemon.entities;
 
+import org.hibernate.validator.constraints.Length;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Entity representing a Pokémon Nature.
@@ -15,19 +19,24 @@ import lombok.Data;
 @Entity
 @Table(name = "natures")
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Nature {
 
     /**
      * Unique identifier for the nature.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false)
+    @NotNull
+    @EqualsAndHashCode.Include
     private Long id;
 
     /**
      * Name of the nature.
      */
     @Column(name = "name", nullable = false, unique = true, length = 50)
+    @NotNull
+    @Length(max = 50)
     private String name;
 
     /**
@@ -35,6 +44,7 @@ public class Nature {
      * Can be null if the nature does not increase any stat.
      */
     @Column(name = "increased_stat", length = 20)
+    @Length(max = 20)
     private String increasedStat = null;
 
     /**
@@ -42,6 +52,7 @@ public class Nature {
      * Can be null if the nature does not decrease any stat.
      */
     @Column(name = "decreased_stat", length = 20)
+    @Length(max = 20)
     private String decreasedStat = null;
 
     /**

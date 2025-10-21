@@ -2,6 +2,8 @@ package com.pokemon.entities;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.validator.constraints.Length;
+
 import com.pokemon.utils.enums.UserRole;
 
 import jakarta.persistence.Column;
@@ -10,7 +12,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Represents a user in the system.
@@ -18,6 +22,7 @@ import lombok.Data;
 @Entity
 @Table(name = "users")
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     /**
@@ -25,31 +30,37 @@ public class User {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false, insertable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
     private Long id;
 
     /**
      * The username of the user.
      */
     @Column(name = "username", nullable = false, unique = true, length = 20)
+    @NotNull
+    @Length(min = 3, max = 20)
     private String username;
 
     /**
      * The password of the user.
      */
     @Column(name = "password_hash", nullable = false)
+    @NotNull
     private String password;
 
     /**
      * The role of the user.
      */
     @Column(name = "user_role", nullable = false)
+    @NotNull
     private UserRole role = UserRole.USER;
 
     /**
      * Account active status.
      */
     @Column(name = "is_active", nullable = false)
+    @NotNull
     private boolean isActive = true;
 
     /**

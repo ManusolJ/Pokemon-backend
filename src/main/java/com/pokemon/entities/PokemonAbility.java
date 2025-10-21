@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -56,5 +57,6 @@ public class PokemonAbility {
      * Indicates if this ability is the hidden ability for the pokemon.
      */
     @Column(name = "is_hidden", nullable = false)
+    @NotNull
     private boolean hidden = false;
 }

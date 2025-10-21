@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.validator.constraints.Length;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +16,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Represents an individual pokemon with various attributes and stats.
@@ -22,43 +26,51 @@ import lombok.Data;
 @Entity
 @Table(name = "pokemon")
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Pokemon {
 
     /**
      * The unique identifier for the pokemon.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id", nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
+    @NotNull
     private Long id;
 
     /**
      * The species identifier this pokemon belongs to.
      */
     @Column(name = "species_id", nullable = false)
+    @NotNull
     private Long speciesId;
 
     /**
      * The name of the pokemon form, if any.
      */
     @Column(name = "form_name", length = 50)
+    @Length(max = 50)
     private String formName = null;
 
     /**
      * Indicates if this is the default form of the species.
      */
     @Column(name = "is_default", nullable = false)
+    @NotNull
     private boolean isDefault = true;
 
     /**
      * The order of this pokemon form, default to 1.
      */
     @Column(name = "order_in_species", nullable = false)
+    @NotNull
     private Integer orderInSpecies = 1;
 
     /**
      * The primary type identifier for this pokemon.
      */
     @Column(name = "type1_id", nullable = false)
+    @NotNull
     private Long type1Id;
 
     /**
@@ -71,48 +83,56 @@ public class Pokemon {
      * The height of the pokemon in meters.
      */
     @Column(name = "height", nullable = false, precision = 5, scale = 2)
+    @NotNull
     private BigDecimal height;
 
     /**
      * The weight of the pokemon in kilograms.
      */
     @Column(name = "weight", nullable = false, precision = 6, scale = 2)
+    @NotNull
     private BigDecimal weight;
 
     /**
      * The base hp stat of the pokemon.
      */
     @Column(name = "hp", nullable = false)
+    @NotNull
     private Integer hp;
 
     /**
      * The base attack stat of the pokemon.
      */
     @Column(name = "attack", nullable = false)
+    @NotNull
     private Integer attack;
 
     /**
      * The base defense stat of the pokemon.
      */
     @Column(name = "defense", nullable = false)
+    @NotNull
     private Integer defense;
 
     /**
      * The base special attack stat of the pokemon.
      */
     @Column(name = "special_attack", nullable = false)
+    @NotNull
     private Integer specialAttack;
 
     /**
      * The base special defense stat of the pokemon.
      */
     @Column(name = "special_defense", nullable = false)
+    @NotNull
     private Integer specialDefense;
 
     /**
      * The base speed stat of the pokemon.
      */
     @Column(name = "speed", nullable = false)
+    @NotNull
     private Integer speed;
 
     /**
