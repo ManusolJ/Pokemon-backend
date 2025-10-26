@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,7 @@ public class User {
      */
     @Column(name = "username", nullable = false, unique = true, length = 20)
     @NotNull
+    @NotBlank
     @Length(min = 3, max = 20)
     private String username;
 
@@ -47,6 +49,8 @@ public class User {
      */
     @Column(name = "password_hash", nullable = false)
     @NotNull
+    @NotBlank
+    @Length(min = 8, max = 20)
     private String password;
 
     /**
