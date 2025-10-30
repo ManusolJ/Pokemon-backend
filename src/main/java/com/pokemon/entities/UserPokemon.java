@@ -3,8 +3,6 @@ package com.pokemon.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,9 +35,9 @@ public class UserPokemon {
      * Unique identifier for the UserPokemon entity.
      */
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    @EqualsAndHashCode.Include
     private Long id;
 
     /**
@@ -59,7 +57,7 @@ public class UserPokemon {
     /**
      * Nickname given to the Pokémon by the user.
      */
-    @Length(max = 30)
+    @Size(max = 30)
     @Column(name = "nickname", length = 30)
     private String nickname = null;
 
@@ -90,17 +88,17 @@ public class UserPokemon {
     /**
      * Indicates if the Pokémon is shiny. Defaults to false.
      */
-    @Column(name = "is_shiny", nullable = false)
     @NotNull
+    @Column(name = "is_shiny", nullable = false)
     private boolean isShiny = false;
 
     /**
      * Level of the Pokémon, ranging from 1 to 100. Defaults to 50.
      */
-    @Column(name = "level", nullable = false)
     @NotNull
     @Min(1)
     @Max(100)
+    @Column(name = "level", nullable = false)
     private Integer level = 50;
 
     /**
@@ -108,68 +106,68 @@ public class UserPokemon {
      * Defaults to 0.
      * The total EVs across all stats can't exceed 510.
      */
-    @Column(name = "hp_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "hp_ev")
     private Integer hpEv = 0;
 
-    @Column(name = "attack_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "attack_ev")
     private Integer attackEv = 0;
 
-    @Column(name = "defense_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "defense_ev")
     private Integer defenseEv = 0;
 
-    @Column(name = "sp_attack_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "sp_attack_ev")
     private Integer spAttackEv = 0;
 
-    @Column(name = "sp_defense_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "sp_defense_ev")
     private Integer spDefenseEv = 0;
 
-    @Column(name = "speed_ev")
     @Min(0)
     @Max(252)
+    @Column(name = "speed_ev")
     private Integer speedEv = 0;
 
     /**
      * Individual Values (IVs) for the Pokémon's stats, ranging from 0 to 31.
      * Defaults to 31.
      */
-    @Column(name = "hp_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "hp_iv")
     private Integer hpIv = 31;
 
-    @Column(name = "attack_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "attack_iv")
     private Integer attackIv = 31;
 
-    @Column(name = "defense_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "defense_iv")
     private Integer defenseIv = 31;
 
-    @Column(name = "sp_attack_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "sp_attack_iv")
     private Integer spAttackIv = 31;
 
-    @Column(name = "sp_defense_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "sp_defense_iv")
     private Integer spDefenseIv = 31;
 
-    @Column(name = "speed_iv")
     @Min(0)
     @Max(31)
+    @Column(name = "speed_iv")
     private Integer speedIv = 31;
 
     @ManyToMany

@@ -1,14 +1,13 @@
 package com.pokemon.entities;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,45 +24,41 @@ public class PokemonSpecies {
      * The unique identifier for the pokemon species.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    @NotNull
     @EqualsAndHashCode.Include
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
     /**
      * The name of the pokemon species.
      */
+    @NotBlank
+    @Size(max = 50)
     @Column(name = "name", nullable = false, unique = true, length = 50)
-    @NotNull
-    @Length(max = 50)
     private String name;
 
     /**
      * The generation number the pokemon species was introduced in.
      */
-    @Column(name = "generation")
     @Min(1)
+    @Column(name = "generation")
     private Integer generation = null;
 
     /**
      * Indicates if the pokemon species is a baby pokemon.
      */
     @Column(name = "is_baby", nullable = false)
-    @NotNull
     private boolean isBaby = false;
 
     /**
      * Indicates if the pokemon species is legendary.
      */
     @Column(name = "is_legendary", nullable = false)
-    @NotNull
     private boolean isLegendary = false;
 
     /**
      * Indicates if the pokemon species is mythical.
      */
     @Column(name = "is_mythical", nullable = false)
-    @NotNull
     private boolean isMythical = false;
 
     /**
@@ -94,7 +89,7 @@ public class PokemonSpecies {
     /**
      * A brief description or flavor text for the pokemon species.
      */
-    @Column(name = "description")
     @Lob
+    @Column(name = "description")
     private String description;
 }

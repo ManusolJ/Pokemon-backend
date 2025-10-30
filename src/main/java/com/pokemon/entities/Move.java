@@ -1,15 +1,17 @@
 package com.pokemon.entities;
 
-import org.hibernate.validator.constraints.Length;
-
 import com.pokemon.utils.enums.DamageClass;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,23 +29,22 @@ public class Move {
      */
     @Id
     @Column(name = "id", nullable = false, updatable = false)
-    @NotNull
     @EqualsAndHashCode.Include
     private Long id;
 
     /**
      * The name of the move.
      */
+    @NotBlank
+    @Size(max = 64)
     @Column(name = "name", nullable = false, unique = true, length = 64)
-    @NotNull
-    @Length(max = 64)
     private String name;
 
     /**
      * The type identifier for the move.
      */
-    @Column(name = "type_id", nullable = false)
     @NotNull
+    @Column(name = "type_id", nullable = false)
     private Long typeId;
 
     /**
@@ -61,22 +62,22 @@ public class Move {
     /**
      * The PP (Power Points) of the move.
      */
-    @Column(name = "pp", nullable = false)
     @NotNull
+    @Column(name = "pp", nullable = false)
     private Integer pp;
 
     /**
      * The priority of the move.
      */
-    @Column(name = "priority", nullable = false)
     @NotNull
+    @Column(name = "priority", nullable = false)
     private Integer priority = 0;
 
     /**
      * The damage class of the move.
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "damage_class", nullable = false)
-    @NotNull
     private DamageClass damageClass;
 
     /**
@@ -94,8 +95,8 @@ public class Move {
     /**
      * The detailed effect description of the move.
      */
-    @Column(name = "effect", nullable = false)
-    @NotNull
     @Lob
+    @NotBlank
+    @Column(name = "effect", nullable = false)
     private String effect;
 }

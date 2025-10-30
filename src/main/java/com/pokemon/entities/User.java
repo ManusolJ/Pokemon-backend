@@ -2,18 +2,18 @@ package com.pokemon.entities;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.validator.constraints.Length;
-
 import com.pokemon.utils.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,41 +30,37 @@ public class User {
      * The unique identifier for the user.
      */
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    @EqualsAndHashCode.Include
     private Long id;
 
     /**
      * The username of the user.
      */
-    @Column(name = "username", nullable = false, unique = true, length = 20)
-    @NotNull
     @NotBlank
-    @Length(min = 3, max = 20)
+    @Size(min = 3, max = 20)
+    @Column(name = "username", nullable = false, unique = true, length = 20)
     private String username;
 
     /**
      * The password of the user.
      */
-    @Column(name = "password_hash", nullable = false)
-    @NotNull
     @NotBlank
-    @Length(min = 8, max = 20)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
     /**
      * The role of the user.
      */
+    @Enumerated(EnumType.STRING)
     @Column(name = "user_role", nullable = false)
-    @NotNull
     private UserRole role = UserRole.USER;
 
     /**
      * Account active status.
      */
     @Column(name = "is_active", nullable = false)
-    @NotNull
     private boolean isActive = true;
 
     /**

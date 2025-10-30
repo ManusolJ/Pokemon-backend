@@ -1,14 +1,13 @@
 package com.pokemon.entities;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,33 +25,32 @@ public class Nature {
      * Unique identifier for the nature.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
-    @NotNull
     @EqualsAndHashCode.Include
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
     /**
      * Name of the nature.
      */
+    @NotBlank
+    @Size(max = 50)
     @Column(name = "name", nullable = false, unique = true, length = 50)
-    @NotNull
-    @Length(max = 50)
     private String name;
 
     /**
      * Stat that is increased by this nature.
      * Can be null if the nature does not increase any stat.
      */
+    @Size(max = 20)
     @Column(name = "increased_stat", length = 20)
-    @Length(max = 20)
     private String increasedStat = null;
 
     /**
      * Stat that is decreased by this nature.
      * Can be null if the nature does not decrease any stat.
      */
+    @Size(max = 20)
     @Column(name = "decreased_stat", length = 20)
-    @Length(max = 20)
     private String decreasedStat = null;
 
     /**

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,30 +32,28 @@ public class Pokemon {
      * The unique identifier for the pokemon.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
     @EqualsAndHashCode.Include
-    @NotNull
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
     /**
      * The species identifier this pokemon belongs to.
      */
-    @Column(name = "species_id", nullable = false)
     @NotNull
+    @Column(name = "species_id", nullable = false)
     private Long speciesId;
 
     /**
      * The name of the pokemon form, if any.
      */
+    @Size(max = 50)
     @Column(name = "form_name", length = 50)
-    @Length(max = 50)
     private String formName = null;
 
     /**
      * Indicates if this is the default form of the species.
      */
     @Column(name = "is_default", nullable = false)
-    @NotNull
     private boolean isDefault = true;
 
     /**

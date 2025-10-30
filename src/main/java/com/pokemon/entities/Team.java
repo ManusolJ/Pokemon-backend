@@ -2,15 +2,15 @@ package com.pokemon.entities;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.validator.constraints.Length;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,24 +27,24 @@ public class Team {
      * The unique identifier for the team.
      */
     @Id
+    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    @EqualsAndHashCode.Include
     private Long id;
 
     /**
      * The ID of the user who owns the team.
      */
-    @Column(name = "user_id", nullable = false)
     @NotNull
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     /**
      * The name of the team.
      */
+    @NotBlank
+    @Size(min = 3, max = 100)
     @Column(name = "name", nullable = false, length = 100)
-    @NotNull
-    @Length(min = 3, max = 100)
     private String name;
 
     /**
