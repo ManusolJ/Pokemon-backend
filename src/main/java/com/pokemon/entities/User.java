@@ -61,7 +61,7 @@ public class User {
      * Account active status.
      */
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean active = true;
 
     /**
      * Timestamp when the user was created.
