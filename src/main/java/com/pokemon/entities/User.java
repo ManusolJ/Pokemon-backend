@@ -1,6 +1,6 @@
 package com.pokemon.entities;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.pokemon.utils.enums.UserRole;
 
@@ -47,8 +47,8 @@ public class User {
      * The password of the user.
      */
     @NotBlank
-    @Column(name = "password_hash", nullable = false)
-    private String password;
+    @Column(name = "password_hash", nullable = false, length = 100)
+    private String passwordHash;
 
     /**
      * The role of the user.
@@ -66,12 +66,12 @@ public class User {
     /**
      * Timestamp when the user was created.
      */
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME(6)")
+    private Instant createdAt;
 
     /**
      * Timestamp when the user was last updated.
      */
-    @Column(name = "updated_at", nullable = false, updatable = false, insertable = false)
-    private LocalDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME(6)")
+    private Instant updatedAt;
 }
