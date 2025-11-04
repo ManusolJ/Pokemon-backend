@@ -98,6 +98,26 @@ public class UserCommandService {
     }
 
     @Transactional
+    public String deactivateMultipleUsers(Collection<Long> ids, boolean activeStatus) {
+        if (ids == null || ids.isEmpty() || ids.size() == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user IDs provided for deactivation");
+        }
+
+        if (ids.stream().anyMatch(Objects::isNull)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Null ID in request");
+        }
+
+        final List<Long> uniqueIds = ids.stream().distinct().toList();
+
+        if (uniqueIds.size() == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No valid user IDs provided for deactivation");
+        }
+
+        int affectedRows = userRepository.updateActiveStatusByIds(activeStatus, uniqueIds);
+        return String.format("Successfully updated active status for %d users.", affectedRows);
+    }
+
+    @Transactional
     public void deleteUser(long id) {
         if (!userRepository.existsById(id)) {
             throw new ResponseStatusException(
