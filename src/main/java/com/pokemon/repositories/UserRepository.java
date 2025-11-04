@@ -19,35 +19,39 @@ import com.pokemon.utils.enums.UserRole;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUsername(String username);
+  Optional<User> findByUsername(String username);
 
-    boolean existsByUsername(String username);
+  Optional<User> findByUsernameIgnoreCase(String username);
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("UPDATE User u SET u.active = :active WHERE u.id IN :ids")
-    int updateActiveStatusByIds(@Param("active") boolean active, @Param("ids") List<Long> ids);
+  boolean existsByUsername(String username);
 
-    @Query("""
-            SELECT u FROM User u
-            WHERE (:username IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%')))
-              AND (:roles IS NULL OR u.role IN :roles)
-              AND (:active IS NULL OR u.active = :active)
-              AND (:createdFrom IS NULL OR u.createdAt >= :createdFrom)
-              AND (:createdTo   IS NULL OR u.createdAt <  :createdTo)
-              AND (:updatedFrom IS NULL OR u.updatedAt >= :updatedFrom)
-              AND (:updatedTo   IS NULL OR u.updatedAt <  :updatedTo)
-            """)
-    Page<User> findUsers(
-            @Param("username") String username,
-            @Param("roles") Collection<UserRole> roles,
-            @Param("active") Boolean active,
-            @Param("createdFrom") Instant createdFrom,
-            @Param("createdTo") Instant createdTo,
-            @Param("updatedFrom") Instant updatedFrom,
-            @Param("updatedTo") Instant updatedTo,
-            Pageable pageable);
+  boolean existsByUsernameIgnoreCase(String username);
 
-    long countByActiveTrue();
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("UPDATE User u SET u.active = :active WHERE u.id IN :ids")
+  int updateActiveStatusByIds(@Param("active") boolean active, @Param("ids") List<Long> ids);
 
-    long countByActiveTrueAndRole(UserRole role);
+  @Query("""
+      SELECT u FROM User u
+      WHERE (:username IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%')))
+        AND (:roles    IS NULL OR u.role IN :roles)
+        AND (:active   IS NULL OR u.active = :active)
+        AND (:createdFrom IS NULL OR u.createdAt >= :createdFrom)
+        AND (:createdTo   IS NULL OR u.createdAt  < :createdTo)
+        AND (:updatedFrom IS NULL OR u.updatedAt >= :updatedFrom)
+        AND (:updatedTo   IS NULL OR u.updatedAt  < :updatedTo)
+      """)
+  Page<User> findUsers(
+      @Param("username") String username,
+      @Param("roles") Collection<UserRole> roles,
+      @Param("active") Boolean active,
+      @Param("createdFrom") Instant createdFrom,
+      @Param("createdTo") Instant createdTo,
+      @Param("updatedFrom") Instant updatedFrom,
+      @Param("updatedTo") Instant updatedTo,
+      Pageable pageable);
+
+  long countByActiveTrue();
+
+  long countByActiveTrueAndRole(UserRole role);
 }
