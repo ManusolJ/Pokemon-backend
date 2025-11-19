@@ -1,0 +1,38 @@
+package com.pokemon.services.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.jpa.domain.Specification;
+
+import com.pokemon.utils.enums.SearchOperation;
+
+public class SpecificationBuilder<T> {
+
+    private final List<SearchCriteria> criteriaList = new ArrayList<>();
+
+    public SpecificationBuilder<T> with(String key, Object value, Object valueTo, SearchOperation operation) {
+        criteriaList.add(new SearchCriteria(key, value, valueTo, operation));
+        return this;
+    }
+
+    public SpecificationBuilder<T> between(String key, Object valueFrom, Object valueTo) {
+        criteriaList.add(new SearchCriteria(key, valueFrom, valueTo, SearchOperation.BETWEEN));
+        return this;
+    }
+
+    public Specification<T> build() {
+        if (criteriaList.isEmpty()) {
+            return null;
+        }
+
+        Specification<T> spec = Specification.unrestricted();
+
+        for (SearchCriteria criteria : criteriaList) {
+            BaseSpecification<T> baseSpec = new BaseSpecification<>(criteria);
+            spec = spec.and(baseSpec);
+        }
+
+        return spec;
+    }
+}
