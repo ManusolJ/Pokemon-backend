@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.pokemon.dtos.pokemon.type.ReadTypeDto;
 import com.pokemon.dtos.pokemon.type.TypeFilterDto;
@@ -16,6 +17,7 @@ import com.pokemon.utils.enums.SearchOperation;
 import com.pokemon.utils.mappers.TypeMapper;
 
 @Service
+@Validated
 public class TypeQueryService extends AbstractQueryService<Type, Long, TypeRepository, ReadTypeDto, TypeMapper> {
 
     public TypeQueryService(TypeMapper mapper, TypeRepository repository) {

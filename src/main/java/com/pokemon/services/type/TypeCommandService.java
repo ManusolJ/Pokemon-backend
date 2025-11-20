@@ -1,18 +1,15 @@
 package com.pokemon.services.type;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.pokemon.dtos.rest.ResourceDto;
-import com.pokemon.dtos.rest.ResourceListDto;
+import com.pokemon.dtos.rest.PokeApiResource;
+import com.pokemon.dtos.rest.PokeApiResourceListDto;
 import com.pokemon.dtos.rest.TypeRestDto;
 import com.pokemon.entities.Type;
 import com.pokemon.repositories.TypeRepository;
@@ -22,102 +19,58 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
-@RequiredArgsConstructor
 @Slf4j
+@Service
+@Transactional
+@RequiredArgsConstructor
 public class TypeCommandService {
 
     private final RestClient restClient;
     private final TypeMapper typeMapper;
     private final TypeRepository typeRepository;
-    private final Executor ioPool = Executors
-            .newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors()));
 
     public void fetchAndSaveTypes() {
-        final ResourceListDto typeList = fetchTypeList();
-        if (typeList == null || typeList.getResults() == null) {
+        PokeApiResourceListDto resourceList = restClient.get()
+                .uri("/type?limit=1000")
+                .retrieve()
+                .body(PokeApiResourceListDto.class);
+
+        if (resourceList == null || resourceList.getResults() == null) {
             throw new IllegalStateException("Failed to fetch types from PokéAPI");
         }
 
-        final List<CompletableFuture<Type>> futures = typeList.getResults().stream()
-                .filter(this::isValidResource)
-                .map(res -> CompletableFuture.supplyAsync(() -> fetchAndConvertType(res), ioPool)
-                        .exceptionally(ex -> {
-                            log.warn("Failed to fetch type: {}", res.getName(), ex);
-                            return null;
-                        }))
-                .toList();
+        int initialFetchSize = resourceList.getResults().size();
 
-        final List<Type> fetched = futures.stream()
-                .map(CompletableFuture::join)
+        List<Type> entityList = resourceList.getResults().stream()
+                .map(this::fetchAndMap)
                 .filter(Objects::nonNull)
                 .toList();
 
-        saveTypesInBatch(fetched);
+        typeRepository.saveAll(entityList);
+        log.info("Fetched and saved {} types from PokéAPI", entityList.size());
+        if (initialFetchSize != entityList.size()) {
+            log.warn("Mismatch in fetched types: initial fetch size was {}, but saved size is {}",
+                    initialFetchSize, entityList.size());
+        }
     }
 
-    private ResourceListDto fetchTypeList() {
-        return restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/type").queryParam("limit", 1000).build())
-                .retrieve()
-                .body(ResourceListDto.class);
-    }
+    private Type fetchAndMap(@NonNull PokeApiResource resource) {
+        URI uri = URI.create(resource.getUrl());
+        String path = uri.getPath().replaceFirst("/api/v2", "");
 
-    @Transactional
-    private void saveTypesInBatch(List<Type> types) {
-        if (types == null || types.isEmpty()) {
-            log.info("No types to save");
-            return;
-        }
-
-        final Set<String> candidateNames = types.stream()
-                .map(Type::getName)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        if (candidateNames.isEmpty()) {
-            log.info("No valid type names to save");
-            return;
-        }
-
-        final List<Long> existingIds = typeRepository.findAllIds();
-        final List<Type> newTypes = types.stream()
-                .filter(t -> t.getId() != null && !existingIds.contains(t.getId()))
-                .toList();
-
-        if (newTypes.isEmpty()) {
-            log.info("No new types to save");
-            return;
-        }
-
-        typeRepository.saveAll(newTypes);
-        log.info("Saved {} new types: {}", newTypes.size(),
-                newTypes.stream().map(Type::getName).toList());
-    }
-
-    private Type fetchAndConvertType(ResourceDto resource) {
-        try {
-            final String rawUrl = resource.getUrl();
-            if (rawUrl == null || rawUrl.trim().isEmpty()) {
-                log.warn("Invalid URL for resource: {}", resource.getName());
-                return null;
-            }
-
-            final TypeRestDto dto = restClient.get().uri(rawUrl).retrieve().body(TypeRestDto.class);
-            if (dto == null || dto.getName() == null)
-                return null;
-
-            return typeMapper.toEntity(dto);
-
-        } catch (Exception e) {
-            log.warn("Failed to convert type from resource: {}", resource.getName(), e);
+        if (path.isBlank()) {
             return null;
         }
-    }
 
-    private boolean isValidResource(ResourceDto r) {
-        return r != null &&
-                r.getName() != null && !r.getName().trim().isEmpty() &&
-                r.getUrl() != null && !r.getUrl().trim().isEmpty();
+        TypeRestDto dto = restClient.get()
+                .uri(path)
+                .retrieve()
+                .body(TypeRestDto.class);
+
+        if (dto == null) {
+            return null;
+        }
+
+        return typeRepository.findById(dto.getId()).orElseGet(() -> typeMapper.toEntity(dto));
     }
 }
