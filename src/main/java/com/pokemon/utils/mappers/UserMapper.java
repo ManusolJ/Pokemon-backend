@@ -3,14 +3,13 @@ package com.pokemon.utils.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
 
 import com.pokemon.dtos.user.CreateUserDto;
 import com.pokemon.dtos.user.ReadUserDto;
 import com.pokemon.dtos.user.UpdateUserDto;
 import com.pokemon.entities.User;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", config = BaseMapperConfig.class)
 public interface UserMapper extends BaseMapper<User, ReadUserDto> {
 
     @Override
