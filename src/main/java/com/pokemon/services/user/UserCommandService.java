@@ -24,8 +24,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 @Validated
+@RequiredArgsConstructor
 public class UserCommandService {
 
     private final UserMapper userMapper;

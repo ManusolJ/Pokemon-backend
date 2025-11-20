@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import com.pokemon.dtos.user.ReadUserDto;
@@ -19,7 +18,6 @@ import com.pokemon.utils.mappers.UserMapper;
 
 @Service
 @Validated
-@Transactional(readOnly = true)
 public class UserQueryService extends AbstractQueryService<User, Long, UserRepository, ReadUserDto, UserMapper> {
 
     public UserQueryService(UserMapper mapper, UserRepository repository) {
