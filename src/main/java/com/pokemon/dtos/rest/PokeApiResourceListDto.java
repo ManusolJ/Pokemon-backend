@@ -9,11 +9,17 @@ import lombok.Getter;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourceListDto {
+public class PokeApiResourceListDto {
 
     @JsonProperty("count")
     private int count;
 
+    @JsonProperty("next")
+    private String next;
+
+    @JsonProperty("previous")
+    private String previous;
+
     @JsonProperty("results")
-    private List<ResourceDto> results;
+    private List<PokeApiResource> results;
 }

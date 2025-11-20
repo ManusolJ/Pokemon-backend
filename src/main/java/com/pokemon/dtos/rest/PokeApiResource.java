@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourceDto {
+public class PokeApiResource {
 
     @JsonProperty("name")
     private String name;
