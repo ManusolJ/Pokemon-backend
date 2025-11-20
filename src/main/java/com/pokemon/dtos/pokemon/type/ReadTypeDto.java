@@ -1,4 +1,4 @@
-package com.pokemon.dtos.pokemon;
+package com.pokemon.dtos.pokemon.type;
 
 import lombok.Data;
 
