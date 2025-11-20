@@ -56,7 +56,7 @@ public class UserCommandService {
         user.setPasswordHash(passwordEncoder.encode(rawPassword));
 
         final User savedUser = userRepository.save(user);
-        return userMapper.toReadUserDto(savedUser);
+        return userMapper.toDto(savedUser);
     }
 
     @Transactional
@@ -94,7 +94,7 @@ public class UserCommandService {
         }
 
         final User updated = userRepository.save(user);
-        return userMapper.toReadUserDto(updated);
+        return userMapper.toDto(updated);
     }
 
     @Transactional
@@ -114,7 +114,11 @@ public class UserCommandService {
         }
 
         int affectedRows = userRepository.updateActiveStatusByIds(activeStatus, uniqueIds);
-        return String.format("Successfully updated active status for %d users.", affectedRows);
+        if (affectedRows == 0) {
+            return "Failed to update active status for the provided user IDs.";
+        } else {
+            return String.format("Successfully updated active status for %d users.", affectedRows);
+        }
     }
 
     @Transactional
