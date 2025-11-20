@@ -4,9 +4,9 @@ import java.time.Instant;
 
 import com.pokemon.utils.enums.UserRole;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class UserFilterDto {
 
     private Long id;
