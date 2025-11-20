@@ -8,9 +8,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.pokemon.dtos.rest.PokeApiResource;
-import com.pokemon.dtos.rest.PokeApiResourceListDto;
 import com.pokemon.dtos.rest.TypeRestDto;
+import com.pokemon.dtos.rest.resource.PokeApiResource;
+import com.pokemon.dtos.rest.resource.PokeApiResourceListDto;
 import com.pokemon.entities.Type;
 import com.pokemon.repositories.TypeRepository;
 import com.pokemon.utils.mappers.TypeMapper;

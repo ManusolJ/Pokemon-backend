@@ -1,4 +1,4 @@
-package com.pokemon.dtos.rest;
+package com.pokemon.dtos.rest.resource;
 
 import java.util.List;
 
