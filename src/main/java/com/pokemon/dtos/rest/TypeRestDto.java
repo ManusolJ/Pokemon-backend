@@ -10,7 +10,7 @@ import lombok.Getter;
 public class TypeRestDto {
 
     @JsonProperty("id")
-    private Long id;
+    private long id;
 
     @JsonProperty("name")
     private String name;
