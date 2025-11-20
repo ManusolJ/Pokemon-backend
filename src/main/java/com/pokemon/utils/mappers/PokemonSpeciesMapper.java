@@ -7,7 +7,7 @@ import com.pokemon.dtos.pokemon.species.ReadPokemonSpeciesDto;
 import com.pokemon.dtos.rest.PokemonSpeciesRestDto;
 import com.pokemon.entities.PokemonSpecies;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", config = BaseMapperConfig.class)
 public interface PokemonSpeciesMapper extends BaseMapper<PokemonSpecies, ReadPokemonSpeciesDto> {
 
     @Override
