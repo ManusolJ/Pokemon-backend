@@ -13,6 +13,7 @@ import com.pokemon.entities.User;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends BaseMapper<User, ReadUserDto> {
 
+    @Override
     ReadUserDto toDto(User entity);
 
     @Mapping(source = "password", target = "passwordHash")
