@@ -1,8 +1,8 @@
 package com.pokemon.dtos.pokemon.species;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class FilterPokemonSpeciesDto {
 
     private Long id;
