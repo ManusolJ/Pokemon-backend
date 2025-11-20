@@ -45,8 +45,12 @@ public class TypeCommandService {
                 .map(this::fetchAndMap)
                 .filter(Objects::nonNull)
                 .toList();
+        if (entityList.isEmpty()) {
+            throw new IllegalStateException("No types were fetched and mapped from PokéAPI");
+        }
 
         typeRepository.saveAll(entityList);
+
         log.info("Fetched and saved {} types from PokéAPI", entityList.size());
         if (initialFetchSize != entityList.size()) {
             log.warn("Mismatch in fetched types: initial fetch size was {}, but saved size is {}",
