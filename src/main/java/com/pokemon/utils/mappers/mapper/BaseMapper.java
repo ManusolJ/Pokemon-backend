@@ -1,4 +1,4 @@
-package com.pokemon.utils.mappers;
+package com.pokemon.utils.mappers.mapper;
 
 public interface BaseMapper<E, D> {
 
