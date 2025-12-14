@@ -29,16 +29,17 @@ public class BaseSpecification<T> implements Specification<T> {
         String key = criteria.getKey();
         Object value = criteria.getValue();
         Object valueTo = criteria.getValueTo();
-        SearchOperation op = criteria.getOperation();
+        SearchOperation operation = criteria.getOperation();
 
         Path<?> path = buildPath(root, key);
 
         try {
-            return switch (op) {
+            return switch (operation) {
                 case EQUAL -> {
                     if (value == null) {
                         yield cb.isNull(path);
                     }
+
                     yield cb.equal(path, value);
                 }
 
@@ -46,6 +47,7 @@ public class BaseSpecification<T> implements Specification<T> {
                     if (value == null) {
                         yield cb.isNotNull(path);
                     }
+
                     yield cb.notEqual(path, value);
                 }
 
@@ -54,36 +56,41 @@ public class BaseSpecification<T> implements Specification<T> {
                         LESS_THAN,
                         LESS_THAN_OR_EQUAL,
                         BETWEEN ->
-                    buildComparablePredicate(op, path, value, valueTo, cb);
+                    buildComparablePredicate(operation, path, value, valueTo, cb);
 
                 case LIKE -> {
                     validateString(value, "LIKE");
+
                     yield cb.like(
                             cb.lower(path.as(String.class)),
-                            ("%" + value + "%").toLowerCase());
+                            ("%" + value + "%").toLowerCase().trim());
                 }
 
                 case STARTS_WITH -> {
                     validateString(value, "STARTS_WITH");
+
                     yield cb.like(
                             cb.lower(path.as(String.class)),
-                            (value + "%").toLowerCase());
+                            (value + "%").toLowerCase().trim());
                 }
 
                 case ENDS_WITH -> {
                     validateString(value, "ENDS_WITH");
+
                     yield cb.like(
                             cb.lower(path.as(String.class)),
-                            ("%" + value).toLowerCase());
+                            ("%" + value).toLowerCase().trim());
                 }
 
                 case IN -> {
                     if (!(value instanceof Collection<?> collection)) {
                         throw new IllegalArgumentException("IN operation requires a Collection value");
                     }
+
                     if (collection.isEmpty()) {
                         yield cb.disjunction();
                     }
+
                     CriteriaBuilder.In<Object> in = cb.in(path);
                     collection.forEach(in::value);
                     yield in;
@@ -93,10 +100,11 @@ public class BaseSpecification<T> implements Specification<T> {
                     if (!(value instanceof Collection<?> collectionNot)) {
                         throw new IllegalArgumentException("NOT_IN operation requires a Collection value");
                     }
+
                     if (collectionNot.isEmpty()) {
-                        // WHERE TRUE
                         yield cb.conjunction();
                     }
+
                     CriteriaBuilder.In<Object> notIn = cb.in(path);
                     collectionNot.forEach(notIn::value);
                     yield cb.not(notIn);
@@ -110,7 +118,8 @@ public class BaseSpecification<T> implements Specification<T> {
             throw new IllegalArgumentException(
                     String.format(
                             "Invalid type for operation %s on field '%s'. Expected: %s",
-                            op, key, getExpectedType(op)),
+                            operation, key, getExpectedType(
+                                    operation)),
                     e);
         }
     }
@@ -121,10 +130,13 @@ public class BaseSpecification<T> implements Specification<T> {
         }
 
         String[] parts = key.split("\\.");
+
         Path<?> path = root;
+
         for (String part : parts) {
             path = path.get(part);
         }
+
         return path;
     }
 
@@ -132,6 +144,7 @@ public class BaseSpecification<T> implements Specification<T> {
         if (value == null) {
             throw new IllegalArgumentException(operation + " operation requires a non-null value");
         }
+
         if (!(value instanceof Comparable<?>)) {
             throw new IllegalArgumentException(operation + " operation requires a Comparable value");
         }
@@ -141,6 +154,7 @@ public class BaseSpecification<T> implements Specification<T> {
         if (value == null) {
             throw new IllegalArgumentException(operation + " operation requires a non-null String value");
         }
+
         if (!(value instanceof String)) {
             throw new IllegalArgumentException(operation + " operation requires a String value");
         }
@@ -162,12 +176,13 @@ public class BaseSpecification<T> implements Specification<T> {
             Object valueTo,
             CriteriaBuilder cb) {
 
-        // Basic runtime validation
         validateComparable(value, op.name());
+
         if (op == SearchOperation.BETWEEN) {
             if (valueTo == null) {
                 throw new IllegalArgumentException("BETWEEN operation requires two non-null values");
             }
+
             validateComparable(valueTo, op.name());
         }
 
