@@ -15,9 +15,9 @@ import lombok.Data;
  * Represents a member of a Pokemon team, linking a team to a specific
  * user-owned Pokemon and its position within the team.
  */
+@Data
 @Entity
 @Table(name = "team_members")
-@Data
 public class TeamMember {
 
     /**
