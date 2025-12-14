@@ -11,26 +11,25 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.pokemon.repositories.BaseRepository;
-import com.pokemon.utils.mappers.BaseMapper;
+import com.pokemon.utils.mappers.mapper.BaseMapper;
 
 import lombok.RequiredArgsConstructor;
 
 @Validated
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public abstract class AbstractQueryService<E, ID, R extends BaseRepository<E, ID>, D, M extends BaseMapper<E, D>>
         implements BaseQueryService<D, ID> {
 
     protected final M mapper;
     protected final R repository;
-    private final Class<E> entityClass;
 
     public D findById(@NonNull ID id) {
         return repository.findById(id)
                 .map(mapper::toDto)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        String.format("Entity %s with id %s not found", entityClass.getSimpleName(), id)));
+                        String.format("Entity %s with id %s not found", getEntityClass().getSimpleName(), id)));
     }
 
     public Page<D> findAll(@NonNull Pageable pageable) {
@@ -51,4 +50,6 @@ public abstract class AbstractQueryService<E, ID, R extends BaseRepository<E, ID
     public long count() {
         return repository.count();
     }
+
+    protected abstract Class<E> getEntityClass();
 }
