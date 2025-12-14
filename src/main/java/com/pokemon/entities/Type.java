@@ -12,9 +12,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents an elemental typing of a pokemon.
  */
+@Data
 @Entity
 @Table(name = "types")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Type {
 
@@ -22,8 +22,8 @@ public class Type {
      * The unique identifier for the type.
      */
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
     @EqualsAndHashCode.Include
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
     /**

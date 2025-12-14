@@ -15,9 +15,9 @@ import lombok.EqualsAndHashCode;
  * Entity representing a Pokémon Nature.
  * Each nature can increase one stat and decrease another, or have no effect.
  */
+@Data
 @Entity
 @Table(name = "natures")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Nature {
 

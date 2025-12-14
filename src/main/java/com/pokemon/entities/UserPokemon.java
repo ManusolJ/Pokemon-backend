@@ -25,9 +25,9 @@ import lombok.EqualsAndHashCode;
  * Entity representing a user's Pokémon with various attributes such as level,
  * EVs, IVs, ability, item, and nature.
  */
+@Data
 @Entity
 @Table(name = "user_pokemon")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserPokemon {
 
@@ -95,8 +95,8 @@ public class UserPokemon {
     /**
      * Level of the Pokémon, ranging from 1 to 100. Defaults to 50.
      */
-    @NotNull
     @Min(1)
+    @NotNull
     @Max(100)
     @Column(name = "level", nullable = false)
     private Integer level = 50;
@@ -171,8 +171,8 @@ public class UserPokemon {
     private Integer speedIv = 31;
 
     @ManyToMany
-    @JoinTable(name = "user_pokemon_moves", joinColumns = @JoinColumn(name = "user_pokemon_id"), inverseJoinColumns = @JoinColumn(name = "move_id"))
     @Size(max = 4)
+    @JoinTable(name = "user_pokemon_moves", joinColumns = @JoinColumn(name = "user_pokemon_id"), inverseJoinColumns = @JoinColumn(name = "move_id"))
     private Set<Move> moves = new HashSet<>();
 
     /**
@@ -180,8 +180,8 @@ public class UserPokemon {
      * ranges before persisting or updating the entity.
      * Sets default values if the provided values are out of range.
      */
-    @PrePersist
     @PreUpdate
+    @PrePersist
     private void validate() {
         // Non-null guards so Bean Validation can run, but we also fail early here
         if (level == null)

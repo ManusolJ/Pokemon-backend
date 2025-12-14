@@ -20,9 +20,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents a user in the system.
  */
+@Data
 @Entity
 @Table(name = "users")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 

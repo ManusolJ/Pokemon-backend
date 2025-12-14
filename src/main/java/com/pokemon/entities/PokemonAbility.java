@@ -17,9 +17,9 @@ import lombok.Data;
  * Represents the association between a Pokemon and its Abilities, including
  * details such as slot and whether the ability is hidden.
  */
+@Data
 @Entity
 @Table(name = "pokemon_abilities")
-@Data
 public class PokemonAbility {
 
     /**

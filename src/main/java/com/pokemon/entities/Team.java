@@ -17,9 +17,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents a pokemon team.
  */
+@Data
 @Entity
 @Table(name = "teams")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Team {
 

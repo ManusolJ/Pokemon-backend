@@ -12,9 +12,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents an item.
  */
+@Data
 @Entity
 @Table(name = "items")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Item {
 

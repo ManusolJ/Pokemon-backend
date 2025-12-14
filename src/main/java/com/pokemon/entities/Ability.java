@@ -13,9 +13,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents a Pokemon ability.
  */
+@Data
 @Entity
 @Table(name = "abilities")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ability {
 

@@ -1,19 +1,21 @@
 package com.pokemon.entities;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -22,9 +24,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents an individual pokemon with various attributes and stats.
  */
+@Data
 @Entity
 @Table(name = "pokemon")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Pokemon {
 
@@ -37,11 +39,19 @@ public class Pokemon {
     private Long id;
 
     /**
-     * The species identifier this pokemon belongs to.
+     * The species this pokemon belongs to.
      */
-    @NotNull
-    @Column(name = "species_id", nullable = false)
-    private Long speciesId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "species", nullable = false)
+    private PokemonSpecies species;
+
+    /**
+     * The name of the pokemon species.
+     */
+    @NotBlank
+    @Size(max = 50)
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private String name;
 
     /**
      * The name of the pokemon form, if any.
@@ -57,85 +67,85 @@ public class Pokemon {
     private boolean isDefault = true;
 
     /**
-     * The order of this pokemon form, default to 1.
+     * The order of the pokemon for sorting purposes.
      */
-    @Column(name = "order_in_species", nullable = false)
+    @Column(name = "order_index", nullable = false)
     @NotNull
-    private Integer orderInSpecies = 1;
+    private Integer order;
 
     /**
      * The primary type identifier for this pokemon.
      */
-    @Column(name = "type1_id", nullable = false)
-    @NotNull
-    private Long type1Id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_type", nullable = false)
+    private Type primaryType;
 
     /**
      * The secondary type identifier for this pokemon, if any.
      */
-    @Column(name = "type2_id")
-    private Long type2Id = null;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "secondary_type")
+    private Type secondaryType = null;
 
     /**
-     * The height of the pokemon in meters.
+     * The height of the pokemon in Decimeters.
      */
-    @Column(name = "height", nullable = false, precision = 5, scale = 2)
     @NotNull
-    private BigDecimal height;
+    @Column(name = "height", nullable = false)
+    private Integer height;
 
     /**
-     * The weight of the pokemon in kilograms.
+     * The weight of the pokemon in Hectograms.
      */
-    @Column(name = "weight", nullable = false, precision = 6, scale = 2)
     @NotNull
-    private BigDecimal weight;
+    @Column(name = "weight", nullable = false)
+    private Integer weight;
 
     /**
      * The base hp stat of the pokemon.
      */
-    @Column(name = "hp", nullable = false)
     @NotNull
+    @Column(name = "hp", nullable = false)
     private Integer hp;
 
     /**
      * The base attack stat of the pokemon.
      */
-    @Column(name = "attack", nullable = false)
     @NotNull
+    @Column(name = "attack", nullable = false)
     private Integer attack;
 
     /**
      * The base defense stat of the pokemon.
      */
-    @Column(name = "defense", nullable = false)
     @NotNull
+    @Column(name = "defense", nullable = false)
     private Integer defense;
 
     /**
      * The base special attack stat of the pokemon.
      */
-    @Column(name = "special_attack", nullable = false)
     @NotNull
+    @Column(name = "special_attack", nullable = false)
     private Integer specialAttack;
 
     /**
      * The base special defense stat of the pokemon.
      */
-    @Column(name = "special_defense", nullable = false)
     @NotNull
+    @Column(name = "special_defense", nullable = false)
     private Integer specialDefense;
 
     /**
      * The base speed stat of the pokemon.
      */
-    @Column(name = "speed", nullable = false)
     @NotNull
+    @Column(name = "speed", nullable = false)
     private Integer speed;
 
     /**
      * Abilities available to each pokemon.
      */
-    @ManyToMany
     @OneToMany(mappedBy = "pokemon", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PokemonAbility> pokemonAbilities = new HashSet<>();
 

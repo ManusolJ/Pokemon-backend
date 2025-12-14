@@ -18,9 +18,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents a move made by a pokemon.
  */
+@Data
 @Entity
 @Table(name = "moves")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Move {
 
@@ -45,7 +45,7 @@ public class Move {
      */
     @NotNull
     @Column(name = "type_id", nullable = false)
-    private Long typeId;
+    private Type type;
 
     /**
      * The accuracy of the move.
@@ -97,6 +97,6 @@ public class Move {
      */
     @Lob
     @NotBlank
-    @Column(name = "effect", nullable = false)
-    private String effect;
+    @Column(name = "flavor_text", nullable = false)
+    private String flavorText;
 }

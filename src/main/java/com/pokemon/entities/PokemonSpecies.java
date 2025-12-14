@@ -2,8 +2,11 @@ package com.pokemon.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -14,9 +17,9 @@ import lombok.EqualsAndHashCode;
 /**
  * Represents a species of pokemon with various attributes.
  */
+@Data
 @Entity
 @Table(name = "pokemon_species")
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PokemonSpecies {
 
@@ -81,10 +84,12 @@ public class PokemonSpecies {
     private Integer baseHappiness;
 
     /**
-     * The identifier of the pokemon species this species evolves from, if any.
+     * The pokemon species this species evolves from, if any.
      */
-    @Column(name = "evolves_from_id")
-    private Long evolvesFromId = null;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "previous_evolution")
+    @JoinColumn(name = "previous_evolution")
+    private PokemonSpecies previousEvolution = null;
 
     /**
      * A brief description or flavor text for the pokemon species.
