@@ -6,4 +6,6 @@ public enum CacheKey {
     POKEMON,
     MOVE,
     ABILITY,
+    ITEM,
+    NATURE,
 }
