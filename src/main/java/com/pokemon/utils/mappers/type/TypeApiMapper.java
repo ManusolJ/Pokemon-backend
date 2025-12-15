@@ -9,9 +9,5 @@ import com.pokemon.utils.mappers.mapper.BaseMapperConfig;
 
 @Mapper(componentModel = "spring", config = BaseMapperConfig.class)
 public interface TypeApiMapper extends BaseMapper<Type, TypeRestDto> {
-
-    @Override
-    TypeRestDto toDto(Type type);
-
     Type toEntity(TypeRestDto dto);
 }

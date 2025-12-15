@@ -9,7 +9,5 @@ import com.pokemon.utils.mappers.mapper.BaseMapperConfig;
 
 @Mapper(componentModel = "spring", config = BaseMapperConfig.class)
 public interface TypeMapper extends BaseMapper<Type, ReadTypeDto> {
-
-    @Override
-    ReadTypeDto toDto(Type type);
+    Type toEntity(ReadTypeDto dto);
 }
