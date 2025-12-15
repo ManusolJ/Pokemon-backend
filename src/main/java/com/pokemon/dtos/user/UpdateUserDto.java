@@ -15,7 +15,7 @@ public class UpdateUserDto {
     @Pattern(regexp = "[A-Za-z0-9_.!-]+$")
     private String username;
 
-    private boolean active;
+    private boolean active = true;
 
-    private UserRole role;
+    private UserRole role = UserRole.USER;
 }
