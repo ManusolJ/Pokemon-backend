@@ -50,7 +50,7 @@ public class PokemonAbility {
      */
     @Min(1)
     @Column(name = "slot", nullable = false)
-    private int slot = 1;
+    private byte slot = 1;
 
     /**
      * Indicates if this ability is the hidden ability for the pokemon.

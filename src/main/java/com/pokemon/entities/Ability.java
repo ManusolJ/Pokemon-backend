@@ -37,10 +37,14 @@ public class Ability {
     private String name;
 
     /**
-     * The description of the ability.
+     * The effect of the ability.
      */
-    @NotBlank
-    @Size(max = 255)
-    @Column(name = "description", nullable = false, length = 255)
-    private String description;
+    @Column(name = "effect", columnDefinition = "TEXT")
+    private String effect;
+
+    /**
+     * The flavor text of the ability.
+     */
+    @Column(name = "flavor_text", columnDefinition = "TEXT")
+    private String flavorText;
 }

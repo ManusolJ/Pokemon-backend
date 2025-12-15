@@ -66,12 +66,12 @@ public class User {
     /**
      * Timestamp when the user was created.
      */
-    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME(6)")
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant createdAt;
 
     /**
      * Timestamp when the user was last updated.
      */
-    @Column(name = "updated_at", nullable = false, updatable = false, insertable = false, columnDefinition = "DATETIME(6)")
+    @Column(name = "updated_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP(6)")
     private Instant updatedAt;
 }

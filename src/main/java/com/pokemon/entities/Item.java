@@ -37,8 +37,12 @@ public class Item {
     /**
      * The description of the item.
      */
-    @NotBlank
-    @Size(max = 255)
-    @Column(name = "description", nullable = false, length = 255)
-    private String description;
+    @Column(name = "effect", columnDefinition = "TEXT")
+    private String effect;
+
+    /**
+     * The flavor text of the item.
+     */
+    @Column(name = "flavor_text", columnDefinition = "TEXT")
+    private String flavorText;
 }

@@ -5,6 +5,10 @@ import com.pokemon.entities.CompositeIDs.TeamMemberId;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -34,4 +38,14 @@ public class TeamMember {
     @Min(1)
     @Max(6)
     private short position;
+
+    @MapsId("teamId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = false)
+    private Team team;
+
+    @MapsId("userPokemonId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_pokemon_id", nullable = false)
+    private UserPokemon userPokemon;
 }

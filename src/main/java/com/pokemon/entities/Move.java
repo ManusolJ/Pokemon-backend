@@ -1,13 +1,18 @@
 package com.pokemon.entities;
 
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 import com.pokemon.utils.enums.DamageClass;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,60 +48,59 @@ public class Move {
     /**
      * The type identifier for the move.
      */
-    @NotNull
-    @Column(name = "type_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type", nullable = false)
     private Type type;
 
     /**
      * The accuracy of the move.
      */
     @Column(name = "accuracy")
-    private Integer accuracy = null;
+    private Byte accuracy = null;
 
     /**
      * The power of the move.
      */
     @Column(name = "power")
-    private Integer power = null;
+    private Byte power = null;
 
     /**
      * The PP (Power Points) of the move.
      */
-    @NotNull
-    @Column(name = "pp", nullable = false)
-    private Integer pp;
+    @Column(name = "pp")
+    private Byte pp = null;
 
     /**
      * The priority of the move.
      */
     @NotNull
     @Column(name = "priority", nullable = false)
-    private Integer priority = 0;
+    private Byte priority = 0;
 
     /**
      * The damage class of the move.
      */
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "damage_class", nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "damage_class", nullable = false, columnDefinition = "damage_class_enum")
     private DamageClass damageClass;
 
     /**
      * The effect chance of the move.
      */
     @Column(name = "effect_chance")
-    private Integer effectChance = null;
+    private Byte effectChance = null;
 
     /**
      * The short effect description of the move.
      */
-    @Column(name = "short_effect", length = 255)
+    @Column(name = "short_effect", columnDefinition = "LONGTEXT")
     private String shortEffect = null;
 
     /**
      * The detailed effect description of the move.
      */
-    @Lob
-    @NotBlank
-    @Column(name = "flavor_text", nullable = false)
-    private String flavorText;
+    @Column(name = "flavor_text", columnDefinition = "LONGTEXT")
+    private String flavorText = null;
 }

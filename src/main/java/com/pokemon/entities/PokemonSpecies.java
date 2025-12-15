@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
@@ -44,7 +43,7 @@ public class PokemonSpecies {
      */
     @Min(1)
     @Column(name = "generation")
-    private Integer generation = null;
+    private Byte generation = null;
 
     /**
      * Indicates if the pokemon species is a baby pokemon.
@@ -69,32 +68,30 @@ public class PokemonSpecies {
      * the species is genderless.
      */
     @Column(name = "gender_rate")
-    private Integer genderRate = null;
+    private Byte genderRate = null;
 
     /**
      * The base capture rate for the pokemon species.
      */
     @Column(name = "capture_rate")
-    private Integer captureRate;
+    private Short captureRate;
 
     /**
      * The base happiness level for the pokemon species.
      */
     @Column(name = "base_happiness")
-    private Integer baseHappiness;
+    private Short baseHappiness;
 
     /**
      * The pokemon species this species evolves from, if any.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "previous_evolution")
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "previous_evolution")
     private PokemonSpecies previousEvolution = null;
 
     /**
      * A brief description or flavor text for the pokemon species.
      */
-    @Lob
-    @Column(name = "description")
-    private String description;
+    @Column(name = "flavor_text", columnDefinition = "TEXT")
+    private String flavorText;
 }
