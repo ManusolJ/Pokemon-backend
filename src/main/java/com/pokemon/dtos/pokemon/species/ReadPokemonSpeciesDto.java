@@ -23,7 +23,7 @@ public class ReadPokemonSpeciesDto {
 
     private Integer baseHappiness;
 
-    private long evolvesFromSpeciesId;
-
     private String description;
+
+    private ReducedReadPokemonSpeciesDto previousEvolution;
 }
