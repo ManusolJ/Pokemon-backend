@@ -1,9 +1,9 @@
 package com.pokemon.utils.enums;
 
 public enum DamageClass {
-    PHYSICAL,
-    SPECIAL,
-    STATUS;
+    physical,
+    special,
+    status;
 
     public static DamageClass fromString(String value) {
         for (DamageClass damageClass : DamageClass.values()) {
