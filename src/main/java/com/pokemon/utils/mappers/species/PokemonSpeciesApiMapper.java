@@ -6,8 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-import com.pokemon.dtos.rest.PokemonSpeciesRestDto;
-import com.pokemon.dtos.rest.TextEntryRestDto;
+import com.pokemon.dtos.rest.pokemon.PokemonSpeciesRestDto;
+import com.pokemon.dtos.rest.resource.FlavorTextRestDto;
 import com.pokemon.dtos.rest.resource.PokeApiResource;
 import com.pokemon.entities.PokemonSpecies;
 import com.pokemon.utils.mappers.mapper.BaseMapper;
@@ -16,13 +16,10 @@ import com.pokemon.utils.mappers.mapper.BaseMapperConfig;
 @Mapper(componentModel = "spring", config = BaseMapperConfig.class)
 public interface PokemonSpeciesApiMapper extends BaseMapper<PokemonSpecies, PokemonSpeciesRestDto> {
 
-    @Override
-    PokemonSpeciesRestDto toDto(PokemonSpecies entity);
-
-    @Mapping(target = "preevolutionId", source = "preevolutionId")
+    @Mapping(target = "previousEvolution", ignore = true)
     @Mapping(target = "generation", source = "generation", qualifiedByName = "generationNameToNumber")
     @Mapping(target = "flavorText", source = "flavorTextEntries", qualifiedByName = "textEntriesToFlavorText")
-    PokemonSpecies toEntity(PokemonSpeciesRestDto dto, Long preevolutionId);
+    PokemonSpecies toEntity(PokemonSpeciesRestDto dto);
 
     @Named("generationNameToNumber")
     static Integer generationNameToNumber(PokeApiResource generation) {
@@ -49,7 +46,7 @@ public interface PokemonSpeciesApiMapper extends BaseMapper<PokemonSpecies, Poke
     }
 
     @Named("textEntriesToFlavorText")
-    static String textEntriesToFlavorText(List<TextEntryRestDto> flavorTextEntries) {
+    static String textEntriesToFlavorText(List<FlavorTextRestDto> flavorTextEntries) {
         if (flavorTextEntries == null) {
             return null;
         }
@@ -58,7 +55,7 @@ public interface PokemonSpeciesApiMapper extends BaseMapper<PokemonSpecies, Poke
                 .filter(entry -> entry != null)
                 .filter(entry -> entry.getLanguage() != null)
                 .filter(entry -> "en".equalsIgnoreCase(entry.getLanguage().getName()))
-                .map(TextEntryRestDto::getFlavorText)
+                .map(FlavorTextRestDto::getFlavorText)
                 .filter(text -> text != null && !text.isBlank())
                 .map(text -> normalizeText(text))
                 .findFirst()
