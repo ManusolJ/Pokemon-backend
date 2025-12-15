@@ -25,7 +25,7 @@ public abstract class AbstractCommandService<E, ID, R extends BaseRepository<E, 
     protected final M apiMapper;
     protected final R repository;
     protected final RestClient restClient;
-    protected final CacheService cacheService;
+    protected final IdentityMapService cacheService;
 
     protected abstract String getEntityName();
 
@@ -34,8 +34,6 @@ public abstract class AbstractCommandService<E, ID, R extends BaseRepository<E, 
     protected abstract String getResourcePath();
 
     protected abstract Class<A> getApiDtoClass();
-
-    protected abstract Long extractEntityId(E entity);
 
     protected abstract String extractEntityName(E entity);
 
@@ -146,11 +144,13 @@ public abstract class AbstractCommandService<E, ID, R extends BaseRepository<E, 
     protected void populateCache(List<E> entities) {
         int cachedCount = 0;
         for (E entity : entities) {
-            Long id = extractEntityId(entity);
             String name = extractEntityName(entity);
 
-            if (name != null && id != null) {
-                cacheService.loadToCache(getCacheKey(), name, id);
+            if (name != null) {
+                cacheService.getOrCreate(
+                        getCacheKey(),
+                        name,
+                        () -> entity);
                 cachedCount++;
             }
         }
