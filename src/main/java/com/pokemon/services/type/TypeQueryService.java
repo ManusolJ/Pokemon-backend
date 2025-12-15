@@ -14,14 +14,14 @@ import com.pokemon.repositories.TypeRepository;
 import com.pokemon.services.service.AbstractQueryService;
 import com.pokemon.services.service.SpecificationBuilder;
 import com.pokemon.utils.enums.SearchOperation;
-import com.pokemon.utils.mappers.TypeMapper;
+import com.pokemon.utils.mappers.type.TypeMapper;
 
 @Service
 @Validated
 public class TypeQueryService extends AbstractQueryService<Type, Long, TypeRepository, ReadTypeDto, TypeMapper> {
 
     public TypeQueryService(TypeMapper mapper, TypeRepository repository) {
-        super(mapper, repository, Type.class);
+        super(mapper, repository);
     }
 
     public Page<ReadTypeDto> filterTypes(TypeFilterDto filter, @NonNull Pageable pageable) {
@@ -46,5 +46,10 @@ public class TypeQueryService extends AbstractQueryService<Type, Long, TypeRepos
         }
 
         return specBuilder.build();
+    }
+
+    @Override
+    protected Class<Type> getEntityClass() {
+        return Type.class;
     }
 }

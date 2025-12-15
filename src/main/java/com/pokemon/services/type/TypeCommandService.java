@@ -1,80 +1,54 @@
 package com.pokemon.services.type;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Objects;
+import java.util.function.Function;
 
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.pokemon.dtos.rest.TypeRestDto;
-import com.pokemon.dtos.rest.resource.PokeApiResource;
-import com.pokemon.dtos.rest.resource.PokeApiResourceListDto;
+import com.pokemon.dtos.rest.types.TypeRestDto;
 import com.pokemon.entities.Type;
 import com.pokemon.repositories.TypeRepository;
-import com.pokemon.utils.mappers.TypeMapper;
+import com.pokemon.services.service.AbstractCommandService;
+import com.pokemon.services.service.IdentityMapService;
+import com.pokemon.utils.enums.CacheKey;
+import com.pokemon.utils.mappers.type.TypeApiMapper;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
-@Transactional
-@RequiredArgsConstructor
-public class TypeCommandService {
+public class TypeCommandService
+        extends AbstractCommandService<Type, Long, TypeRepository, TypeRestDto, TypeApiMapper> {
 
-    private final RestClient restClient;
-    private final TypeMapper typeMapper;
-    private final TypeRepository typeRepository;
-
-    public void fetchAndSaveTypes() {
-        PokeApiResourceListDto resourceList = restClient.get()
-                .uri("/type?limit=1000")
-                .retrieve()
-                .body(PokeApiResourceListDto.class);
-
-        if (resourceList == null || resourceList.getResults() == null) {
-            throw new IllegalStateException("Failed to fetch types from PokéAPI");
-        }
-
-        int initialFetchSize = resourceList.getResults().size();
-
-        List<Type> entityList = resourceList.getResults().stream()
-                .map(this::fetchAndMap)
-                .filter(Objects::nonNull)
-                .toList();
-        if (entityList.isEmpty()) {
-            throw new IllegalStateException("No types were fetched and mapped from PokéAPI");
-        }
-
-        typeRepository.saveAll(entityList);
-
-        log.info("Fetched and saved {} types from PokéAPI", entityList.size());
-        if (initialFetchSize != entityList.size()) {
-            log.warn("Mismatch in fetched types: initial fetch size was {}, but saved size is {}",
-                    initialFetchSize, entityList.size());
-        }
+    public TypeCommandService(TypeRepository repository, TypeApiMapper mapper, RestClient restClient,
+            IdentityMapService cacheService) {
+        super(mapper, repository, restClient, cacheService);
     }
 
-    private Type fetchAndMap(@NonNull PokeApiResource resource) {
-        URI uri = URI.create(resource.getUrl());
-        String path = uri.getPath().replaceFirst("/api/v2", "");
+    @Override
+    protected CacheKey getCacheKey() {
+        return CacheKey.TYPE;
+    }
 
-        if (path.isBlank()) {
-            return null;
-        }
+    @Override
+    protected String extractEntityName(Type entity) {
+        return entity.getName();
+    }
 
-        TypeRestDto dto = restClient.get()
-                .uri(path)
-                .retrieve()
-                .body(TypeRestDto.class);
+    @Override
+    protected String getResourcePath() {
+        return "/type?limit=20";
+    }
 
-        if (dto == null) {
-            return null;
-        }
+    @Override
+    protected Class<TypeRestDto> getApiDtoClass() {
+        return TypeRestDto.class;
+    }
 
-        return typeRepository.findById(dto.getId()).orElseGet(() -> typeMapper.toEntity(dto));
+    @Override
+    protected String getEntityName() {
+        return "types";
+    }
+
+    @Override
+    protected Function<TypeRestDto, Type> getEntityConverter() {
+        return dto -> apiMapper.toEntity(dto);
     }
 }

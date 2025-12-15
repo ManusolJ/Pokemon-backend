@@ -98,24 +98,25 @@ public class UserCommandService {
     }
 
     @Transactional
-    public String deactivateMultipleUsers(Collection<Long> ids, boolean activeStatus) {
-        if (ids == null || ids.isEmpty() || ids.size() == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user IDs provided for deactivation");
+    public String changeActivationStatusOfMultipleUsers(Collection<Long> ids, boolean activeStatus) {
+        String action = activeStatus ? "activation" : "deactivation";
+
+        if (ids == null || ids.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user IDs provided for " + action);
         }
 
-        if (ids.stream().anyMatch(Objects::isNull)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Null ID in request");
+        List<Long> validIds = ids.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if (validIds.size() == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No valid user IDs provided for " + action);
         }
 
-        final List<Long> uniqueIds = ids.stream().distinct().toList();
-
-        if (uniqueIds.size() == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No valid user IDs provided for deactivation");
-        }
-
-        int affectedRows = userRepository.updateActiveStatusByIds(activeStatus, uniqueIds);
+        int affectedRows = userRepository.updateActiveStatusByIds(activeStatus, validIds);
         if (affectedRows == 0) {
-            return "Failed to update active status for the provided user IDs.";
+            return "Failed to proceed with " + action + " for the provided user IDs.";
         } else {
             return String.format("Successfully updated active status for %d users.", affectedRows);
         }
@@ -133,7 +134,7 @@ public class UserCommandService {
 
     @Transactional
     public void deleteMultipleUsers(Collection<Long> ids) {
-        if (ids == null || ids.isEmpty() || ids.size() == 0) {
+        if (ids == null || ids.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user IDs provided for deletion");
         }
 

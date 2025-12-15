@@ -1,150 +1,126 @@
 package com.pokemon.services.species;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.pokemon.dtos.pokemon.species.FilterPokemonSpeciesDto;
-import com.pokemon.dtos.pokemon.species.ReadPokemonSpeciesDto;
-import com.pokemon.dtos.rest.PokemonSpeciesRestDto;
-import com.pokemon.dtos.rest.TextEntryRestDto;
+import com.pokemon.dtos.rest.pokemon.PokemonSpeciesRestDto;
 import com.pokemon.dtos.rest.resource.PokeApiResource;
-import com.pokemon.dtos.rest.resource.PokeApiResourceListDto;
 import com.pokemon.entities.PokemonSpecies;
 import com.pokemon.repositories.PokemonSpeciesRepository;
-import com.pokemon.utils.mappers.PokemonSpeciesMapper;
+import com.pokemon.services.service.AbstractCommandService;
+import com.pokemon.services.service.IdentityMapService;
+import com.pokemon.utils.enums.CacheKey;
+import com.pokemon.utils.mappers.species.PokemonSpeciesApiMapper;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@Transactional
-@RequiredArgsConstructor
-public class PokemonSpeciesCommandService {
+public class PokemonSpeciesCommandService extends
+        AbstractCommandService<PokemonSpecies, Long, PokemonSpeciesRepository, PokemonSpeciesRestDto, PokemonSpeciesApiMapper> {
 
-    private final RestClient restClient;
-    private final PokemonSpeciesMapper pokemonSpeciesMapper;
-    private final PokemonSpeciesRepository pokemonSpeciesRepository;
-    private final PokemonSpeciesQueryService pokemonSpeciesQueryService;
+    public PokemonSpeciesCommandService(PokemonSpeciesRepository repository, PokemonSpeciesApiMapper mapper,
+            RestClient restClient, IdentityMapService cacheService) {
+        super(mapper, repository, restClient, cacheService);
+    }
 
-    public void fetchAndSavePokemonSpecies() {
-        PokeApiResourceListDto resourceList = restClient.get()
-                .uri("/pokemon-species?limit=1000")
-                .retrieve()
-                .body(PokeApiResourceListDto.class);
+    @Override
+    protected CacheKey getCacheKey() {
+        return CacheKey.POKEMON_SPECIES;
+    }
 
-        if (resourceList == null || resourceList.getResults() == null) {
-            throw new IllegalStateException("Failed to fetch Pokémon species from PokéAPI");
-        }
+    @Override
+    protected String extractEntityName(PokemonSpecies entity) {
+        return entity.getName();
+    }
 
-        int initialFetchSize = resourceList.getResults().size();
+    @Override
+    protected String getResourcePath() {
+        return "/pokemon-species?limit=20";
+    }
 
-        List<PokemonSpecies> entityList = resourceList.getResults().stream()
+    @Override
+    protected Class<PokemonSpeciesRestDto> getApiDtoClass() {
+        return PokemonSpeciesRestDto.class;
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "species";
+    }
+
+    @Override
+    protected Function<PokemonSpeciesRestDto, PokemonSpecies> getEntityConverter() {
+        return null;
+    }
+
+    @Override
+    public void fetchAndSave() {
+        List<PokeApiResource> resources = fetchResourceList();
+        int initialFetchSize = resources.size();
+
+        List<PokemonSpecies> entities = new ArrayList<>();
+
+        List<PokemonSpeciesRestDto> dtos = resources.stream()
+                .map(this::fetchApiDto)
                 .filter(Objects::nonNull)
-                .map(this::fetchAndMap)
                 .toList();
 
-        if (entityList.isEmpty()) {
-            throw new IllegalStateException("No Pokémon species were fetched and mapped from PokéAPI");
-        }
-
-        pokemonSpeciesRepository.saveAll(entityList);
-
-        log.info("Fetched and saved {} Pokémon species from PokéAPI", entityList.size());
-        if (initialFetchSize != entityList.size()) {
-            log.warn("Mismatch in fetched Pokémon species: initial fetch size was {}, but saved size is {}",
-                    initialFetchSize, entityList.size());
-        }
-    }
-
-    private PokemonSpecies fetchAndMap(@NonNull PokeApiResource resource) {
-        if (resource.getUrl() == null || resource.getUrl().isBlank()) {
-            return null;
-        }
-
-        URI uri = URI.create(resource.getUrl());
-        String path = uri.getPath().replaceFirst("/api/v2", "");
-
-        if (path.isBlank()) {
-            return null;
-        }
-
-        PokemonSpeciesRestDto dto = restClient.get()
-                .uri(path)
-                .retrieve()
-                .body(PokemonSpeciesRestDto.class);
-
-        if (dto == null) {
-            return null;
-        }
-
-        String flavorText = fetchFlavorText(dto.getFlavorTextEntries());
-
-        long evolvesFromId = fetchEvolvesFromId(dto.getEvolvesFromId());
-
-        int generation = fetchGeneration(dto.getGeneration());
-
-        return pokemonSpeciesRepository.findById(dto.getId())
-                .orElseGet(() -> pokemonSpeciesMapper.toEntity(dto, flavorText, evolvesFromId, generation));
-    }
-
-    private String fetchFlavorText(List<TextEntryRestDto> entries) {
-        return entries.stream()
+        List<PokemonSpecies> firstPassEntities = dtos.stream()
+                .map(apiMapper::toEntity)
+                .map(entity -> cacheService.getOrCreate(getCacheKey(), entity.getName(), () -> entity))
                 .filter(Objects::nonNull)
-                .filter(entry -> "en".equalsIgnoreCase(entry.getLanguage().getName()))
-                .map(TextEntryRestDto::getFlavorText)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse("No description available.");
-    }
+                .toList();
 
-    private Long fetchEvolvesFromId(PokeApiResource evolvesFromResource) {
-        if (evolvesFromResource == null || evolvesFromResource.getUrl() == null
-                || evolvesFromResource.getUrl().isBlank()) {
-            return null;
+        if (firstPassEntities.isEmpty()) {
+            throw new IllegalStateException(
+                    "No " + getEntityName() + " were fetched and mapped from PokéAPI");
         }
 
-        String speciesName = evolvesFromResource.getName();
+        repository.saveAllAndFlush(firstPassEntities);
 
-        FilterPokemonSpeciesDto filterDto = new FilterPokemonSpeciesDto();
-        filterDto.setName(speciesName);
-
-        return pokemonSpeciesQueryService
-                .filterPokemonSpecies(filterDto, Pageable.ofSize(1))
-                .stream()
-                .findFirst()
-                .map(ReadPokemonSpeciesDto::getId)
-                .orElse(null);
-
-    }
-
-    private int fetchGeneration(PokeApiResource generationResource) {
-        if (generationResource == null || generationResource.getUrl() == null
-                || generationResource.getUrl().isBlank()) {
-            return 0;
-        }
-
-        String url = generationResource.getUrl();
-        try {
-            URI uri = URI.create(url);
-            String path = uri.getPath();
-            String[] segments = path.split("/");
-            for (int i = segments.length - 1; i >= 0; i--) {
-                if (!segments[i].isBlank()) {
-                    return Integer.parseInt(segments[i]);
+        for (PokemonSpeciesRestDto dto : dtos) {
+            String name = dto.getName();
+            PokemonSpecies species = cacheService.get(getCacheKey(), name);
+            if (dto.getPreviousEvolution() != null) {
+                String prevName = dto.getPreviousEvolution().getName();
+                PokemonSpecies prevSpecies = cacheService.get(getCacheKey(), prevName);
+                if (prevSpecies == null) {
+                    log.warn("Previous evolution '{}' for '{}' not found", prevName, name);
+                } else {
+                    species.setPreviousEvolution(prevSpecies);
                 }
+                entities.add(species);
             }
-        } catch (Exception e) {
-            log.warn("Failed to parse generation id from URL: {}", url, e);
         }
-        return 0;
+
+        entities = entities.stream().filter(Objects::nonNull).distinct().toList();
+
+        saveAllAndLog(entities, initialFetchSize);
+    }
+
+    @Override
+    public void saveAllAndLog(List<PokemonSpecies> entities, int initialFetchSize) {
+        if (entities.isEmpty()) {
+            throw new IllegalStateException(
+                    "No " + getEntityName() + " were fetched and mapped from PokéAPI");
+        }
+
+        List<PokemonSpecies> savedEntities = repository.saveAll(entities);
+
+        int savedCount = savedEntities.size();
+
+        log.info("Fetched and saved {} {} from PokéAPI", savedEntities, getEntityName());
+
+        if (initialFetchSize != savedCount) {
+            log.warn("Mismatch in fetched {}: initial fetch size was {}, but saved size is {}",
+                    getEntityName(), initialFetchSize, savedCount);
+        }
     }
 
 }

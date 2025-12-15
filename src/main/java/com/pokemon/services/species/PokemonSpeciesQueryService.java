@@ -7,14 +7,16 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import com.pokemon.dtos.pokemon.species.FilterPokemonSpeciesDto;
+import com.pokemon.dtos.pokemon.species.PokemonSpeciesFilterDto;
 import com.pokemon.dtos.pokemon.species.ReadPokemonSpeciesDto;
 import com.pokemon.entities.PokemonSpecies;
 import com.pokemon.repositories.PokemonSpeciesRepository;
 import com.pokemon.services.service.AbstractQueryService;
 import com.pokemon.services.service.SpecificationBuilder;
 import com.pokemon.utils.enums.SearchOperation;
-import com.pokemon.utils.mappers.PokemonSpeciesMapper;
+import com.pokemon.utils.mappers.species.PokemonSpeciesMapper;
+
+import jakarta.persistence.criteria.JoinType;
 
 @Service
 @Validated
@@ -22,16 +24,29 @@ public class PokemonSpeciesQueryService extends
         AbstractQueryService<PokemonSpecies, Long, PokemonSpeciesRepository, ReadPokemonSpeciesDto, PokemonSpeciesMapper> {
 
     public PokemonSpeciesQueryService(PokemonSpeciesMapper mapper, PokemonSpeciesRepository repository) {
-        super(mapper, repository, PokemonSpecies.class);
+        super(mapper, repository);
     }
 
-    Page<ReadPokemonSpeciesDto> filterPokemonSpecies(FilterPokemonSpeciesDto filter, @NonNull Pageable pageable) {
+    public Page<ReadPokemonSpeciesDto> filterPokemonSpecies(PokemonSpeciesFilterDto filter,
+            @NonNull Pageable pageable) {
         Specification<PokemonSpecies> specification = buildSpecification(filter);
-        return repository.findAll(specification, pageable)
-                .map(mapper::toDto);
+
+        Specification<PokemonSpecies> fetchSpec = (root, query, cb) -> {
+            if (query != null && !query.getResultType().equals(Long.class)) {
+                root.join("previousEvolution", JoinType.LEFT);
+                query.distinct(true);
+            }
+            return cb.conjunction();
+        };
+
+        Specification<PokemonSpecies> finalSpec = specification == null ? fetchSpec : specification.and(fetchSpec);
+
+        Page<PokemonSpecies> pokemonSpeciesPage = repository.findAll(finalSpec, pageable);
+
+        return pokemonSpeciesPage.map(mapper::toDto);
     }
 
-    private Specification<PokemonSpecies> buildSpecification(FilterPokemonSpeciesDto filter) {
+    private Specification<PokemonSpecies> buildSpecification(PokemonSpeciesFilterDto filter) {
         SpecificationBuilder<PokemonSpecies> specBuilder = new SpecificationBuilder<>();
 
         if (filter.getId() != null) {
@@ -75,5 +90,10 @@ public class PokemonSpeciesQueryService extends
         }
 
         return specBuilder.build();
+    }
+
+    @Override
+    protected Class<PokemonSpecies> getEntityClass() {
+        return PokemonSpecies.class;
     }
 }

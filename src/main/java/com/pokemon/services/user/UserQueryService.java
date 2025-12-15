@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import com.pokemon.dtos.user.ReadUserDto;
 import com.pokemon.dtos.user.UserFilterDto;
@@ -17,11 +16,10 @@ import com.pokemon.utils.enums.SearchOperation;
 import com.pokemon.utils.mappers.UserMapper;
 
 @Service
-@Validated
 public class UserQueryService extends AbstractQueryService<User, Long, UserRepository, ReadUserDto, UserMapper> {
 
     public UserQueryService(UserMapper mapper, UserRepository repository) {
-        super(mapper, repository, User.class);
+        super(mapper, repository);
     }
 
     public Page<ReadUserDto> filterUsers(UserFilterDto filter, @NonNull Pageable pageable) {
@@ -77,6 +75,11 @@ public class UserQueryService extends AbstractQueryService<User, Long, UserRepos
         }
 
         return specBuilder.build();
+    }
+
+    @Override
+    protected Class<User> getEntityClass() {
+        return User.class;
     }
 
 }
