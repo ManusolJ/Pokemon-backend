@@ -1,9 +1,9 @@
 package com.pokemon.entities;
 
 import java.time.Instant;
-
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import com.pokemon.utils.enums.UserRole;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Represents a user in the system.
+ * Represents a user in the system, persisted to db within the "users" table.
  */
 @Data
 @Entity
@@ -54,6 +54,7 @@ public class User {
      * The role of the user.
      */
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "user_role", nullable = false)
     private UserRole role = UserRole.USER;
 
